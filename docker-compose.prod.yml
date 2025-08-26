@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: fintech_postgres_prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fintech_db
+      POSTGRES_USER: fintech_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_123}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fintech_user -d fintech_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: fintech_backend_prod
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://fintech_user:${POSTGRES_PASSWORD:-secure_password_123}@postgres:5432/fintech_db
+      JWT_SECRET: ${JWT_SECRET:-your-super-secure-jwt-secret-key-for-production}
+      PORT: 3001
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/logs:/app/logs
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: fintech_frontend_prod
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    container_name: fintech_redis_prod
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data_prod:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
+
+networks:
+  default:
+    name: fintech_network_prod

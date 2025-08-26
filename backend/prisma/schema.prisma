@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mysql" or "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  password  String
+  expenses  Expense[]
+  createdAt DateTime  @default(now())
+  Wallet    Wallet?
+
+  // 🔥 Add opposite relations
+  transactions         Transaction[] @relation("UserTransactions")
+  sentTransactions     Transaction[] @relation("SentTransactions")
+  receivedTransactions Transaction[] @relation("ReceivedTransactions")
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(now())
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  expenses Expense[]
+}
+
+model Wallet {
+  id          String   @id @default(uuid())
+  fiatBalance Float    @default(0) // USD balance
+  btcBalance  Float    @default(0) // BTC balance
+  createdAt   DateTime @default(now())
+
+  // Relation back to User
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Transaction history relation
+  transactions Transaction[]
+  virtualCards VirtualCard[]
+}
+
+model VirtualCard {
+  id         String   @id @default(uuid())
+  cardNumber String   @unique
+  expiryDate String
+  cvv        String
+  createdAt  DateTime @default(now())
+
+  walletId String
+  wallet   Wallet @relation(fields: [walletId], references: [id])
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  // Main user relation (owner of the transaction)
+  userId String
+  user   User   @relation("UserTransactions", fields: [userId], references: [id])
+
+  // Optional sender/receiver for P2P
+  senderId   String?
+  receiverId String?
+  sender     User?   @relation("SentTransactions", fields: [senderId], references: [id])
+  receiver   User?   @relation("ReceivedTransactions", fields: [receiverId], references: [id])
+
+  amount Float
+  note   String?
+
+  // Enums
+  type     TransactionType // income or expense
+  category TransactionCategory // wallet, p2p, etc.
+
+  // Status
+  status TransactionStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Wallet   Wallet? @relation(fields: [walletId], references: [id])
+  walletId String?
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionCategory {
+  WALLET // money added/withdrawn to wallet
+  P2P // peer-to-peer transfer
+  CRYPTO
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
