@@ -199,30 +199,49 @@ export const transfer = async (req, res) => {
 		if (req.io) {
 			console.log("Emitting Socket.IO events...");
 
+			// Fetch complete transaction records with user details for real-time updates
+			const senderTransactionWithUsers = await prisma.transaction.findUnique({
+				where: { id: result[2].id },
+				include: {
+					sender: { select: { id: true, email: true, name: true } },
+					receiver: { select: { id: true, email: true, name: true } },
+				},
+			});
+
+			const receiverTransactionWithUsers = await prisma.transaction.findUnique({
+				where: { id: result[3].id },
+				include: {
+					sender: { select: { id: true, email: true, name: true } },
+					receiver: { select: { id: true, email: true, name: true } },
+				},
+			});
+
 			// Emit to sender - wallet update and new transaction
 			req.io.to(`user_${fromUserId}`).emit("walletUpdate", {
 				userId: fromUserId,
-				balance: result[0].fiatBalance, // Updated sender balance
+				balance: result[0].fiatBalance,
 				btcBalance: result[0].btcBalance,
+				transaction: senderTransactionWithUsers,
 			});
 			req.io.to(`user_${fromUserId}`).emit("transactionUpdate", {
 				userId: fromUserId,
-				transaction: result[2], // Sender's transaction record
+				transaction: senderTransactionWithUsers,
 			});
 
 			// Emit to receiver - wallet update and new transaction
 			req.io.to(`user_${recipientUser.id}`).emit("walletUpdate", {
 				userId: recipientUser.id,
-				balance: result[1].fiatBalance, // Updated receiver balance
+				balance: result[1].fiatBalance,
 				btcBalance: result[1].btcBalance,
+				transaction: receiverTransactionWithUsers,
 			});
 			req.io.to(`user_${recipientUser.id}`).emit("transactionUpdate", {
 				userId: recipientUser.id,
-				transaction: result[3], // Receiver's transaction record
+				transaction: receiverTransactionWithUsers,
 			});
 
 			console.log(
-				`Emitted updates to user_${fromUserId} and user_${recipientUser.id}`
+				`Emitted updates with user details to user_${fromUserId} and user_${recipientUser.id}`
 			);
 		}
 

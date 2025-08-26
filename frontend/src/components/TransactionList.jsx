@@ -1,6 +1,18 @@
 // src/components/TransactionsList.jsx
 import { useEffect, useState } from "react";
 import { getTransactions } from "../api/transactionService";
+import { io } from "socket.io-client";
+
+// Initialize socket connection
+let socket = null;
+const initializeSocket = () => {
+	if (!socket) {
+		socket = io("http://localhost:3001", {
+			transports: ["websocket", "polling"],
+		});
+	}
+	return socket;
+};
 
 const TransactionsList = ({ refreshTrigger }) => {
 	const [transactions, setTransactions] = useState([]);
@@ -29,17 +41,117 @@ const TransactionsList = ({ refreshTrigger }) => {
 		fetchTransactions();
 	}, [refreshTrigger]);
 
-	// Listen for real-time transaction updates
+	// Enhanced real-time Socket.IO listener for recipients
 	useEffect(() => {
+		const socketInstance = initializeSocket();
+
+		// Get current user info from localStorage
+		const userInfo = JSON.parse(localStorage.getItem("user") || "{}");
+		const currentUserId = userInfo.id;
+
+		console.log("Setting up Socket.IO listeners for user:", currentUserId);
+
+		// Join user-specific room
+		if (currentUserId) {
+			socketInstance.emit("joinUser", currentUserId);
+			console.log("Joined Socket.IO room for user:", currentUserId);
+		}
+
+		// Listen for transaction updates specifically for recipients
+		const handleTransactionUpdate = (data) => {
+			console.log("TransactionList: Received transactionUpdate:", data);
+
+			// Check if this update is relevant to current user
+			if (
+				data.transaction &&
+				(data.transaction.senderId === currentUserId ||
+					data.transaction.receiverId === currentUserId)
+			) {
+				console.log("TransactionList: Adding new transaction for current user");
+
+				// Add the new transaction to the top of the list and remove duplicates
+				setTransactions((prev) => {
+					const newTransaction = data.transaction;
+					// Remove any existing transaction with same ID to prevent duplicates
+					const filteredTransactions = prev.filter(
+						(t) => t.id !== newTransaction.id
+					);
+					return [newTransaction, ...filteredTransactions];
+				});
+			}
+		};
+
+		// Listen for wallet updates (which include transaction info)
+		const handleWalletUpdate = (data) => {
+			console.log("TransactionList: Received walletUpdate:", data);
+
+			// If wallet update includes transaction info, handle it
+			if (
+				data.transaction &&
+				(data.transaction.senderId === currentUserId ||
+					data.transaction.receiverId === currentUserId)
+			) {
+				console.log(
+					"TransactionList: Processing wallet update with transaction"
+				);
+
+				setTransactions((prev) => {
+					const newTransaction = data.transaction;
+					const filteredTransactions = prev.filter(
+						(t) => t.id !== newTransaction.id
+					);
+					return [newTransaction, ...filteredTransactions];
+				});
+			}
+		};
+
+		// Set up all event listeners
+		socketInstance.on("transactionUpdate", handleTransactionUpdate);
+		socketInstance.on("walletUpdate", handleWalletUpdate);
+
+		// Custom event listener (fallback)
 		const handleNewTransaction = (event) => {
 			const newTransaction = event.detail;
 			console.log(
-				"New transaction received in TransactionList:",
+				"TransactionList: Custom event - New transaction:",
 				newTransaction
 			);
 
 			// Add the new transaction to the top of the list
-			setTransactions((prev) => [newTransaction, ...prev]);
+			setTransactions((prev) => {
+				const filteredTransactions = prev.filter(
+					(t) => t.id !== newTransaction.id
+				);
+				return [newTransaction, ...filteredTransactions];
+			});
+		};
+
+		window.addEventListener("newTransaction", handleNewTransaction);
+
+		// Cleanup
+		return () => {
+			socketInstance.off("transactionUpdate", handleTransactionUpdate);
+			socketInstance.off("walletUpdate", handleWalletUpdate);
+			window.removeEventListener("newTransaction", handleNewTransaction);
+		};
+	}, []);
+
+	// Listen for real-time transaction updates (keeping original for compatibility)
+	useEffect(() => {
+		const handleNewTransaction = (event) => {
+			const newTransaction = event.detail;
+			console.log(
+				"TransactionList: Legacy event - New transaction received:",
+				newTransaction
+			);
+
+			// Add the new transaction to the top of the list
+			setTransactions((prev) => {
+				const filteredTransactions = prev.filter(
+					(t) => t.id !== newTransaction.id
+				);
+				return [newTransaction, ...filteredTransactions];
+			});
 		};
 
 		window.addEventListener("newTransaction", handleNewTransaction);
@@ -61,8 +173,24 @@ const TransactionsList = ({ refreshTrigger }) => {
 		if (txn.category === "P2P") {
 			// P2P transfers - show recipient info for outgoing, sender info for incoming
 			const otherUser = txn.type === "EXPENSE" ? txn.receiver : txn.sender;
-			const otherUserName =
-				otherUser?.name || otherUser?.email || "Unknown User";
+
+			// Enhanced user name resolution
+			let otherUserName = "Unknown User";
+
+			if (otherUser && (otherUser.name || otherUser.email)) {
+				// If we have the user object with name or email, use it
+				otherUserName = otherUser.name || otherUser.email;
+			} else if (txn.note) {
+				// Fallback: extract name from transaction note
+				if (txn.type === "EXPENSE" && txn.note.includes("Transfer to ")) {
+					otherUserName = txn.note.replace("Transfer to ", "");
+				} else if (
+					txn.type === "INCOME" &&
+					txn.note.includes("Received from ")
+				) {
+					otherUserName = txn.note.replace("Received from ", "");
+				}
+			}
 
 			return {
 				description: `${
