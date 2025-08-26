@@ -1,13 +1,13 @@
 # 🚀 Fintech Expense Tracker
 
-A comprehensive fintech application built with modern web technologies, featuring real-time transactions, cryptocurrency conversion, virtual cards, and admin analytics.
+A comprehensive fintech application built with modern web technologies, featuring real-time transactions, cryptocurrency conversion, virtual cards, and analytics.
 
 ## ✨ Features
 
 ### 🔐 Authentication & Security
 
 - JWT-based authentication with HTTP-only cookies
-- Role-based access control (User/Admin)
+- Role-based access control (User)
 - Secure password hashing with bcrypt
 - Protected routes and middleware
 
@@ -39,7 +39,7 @@ A comprehensive fintech application built with modern web technologies, featurin
 - Secure CVV and expiry dates
 - Card management interface
 
-### 📊 Admin Dashboard
+### 📊 Analytics Dashboard
 
 - User statistics and analytics
 - Transaction monitoring
@@ -157,7 +157,6 @@ After running the seed script, you can use these accounts:
 
 - **User**: alice@demo.com / password123
 - **User**: bob@demo.com / password123
-- **Admin**: admin@demo.com / password123
 
 ## 📝 API Endpoints
 
@@ -189,9 +188,9 @@ After running the seed script, you can use these accounts:
 - `POST /api/virtual-cards` - Create virtual card
 - `GET /api/virtual-cards` - Get user's cards
 
-### Admin
+### Analytics
 
-- `GET /api/admin/dashboard` - Admin statistics
+- `GET /api/analytics/summary` - Application statistics (analytics)
 
 ## 🔧 Development
 
