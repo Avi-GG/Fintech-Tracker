@@ -6,7 +6,7 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 const conversionRoutes = (io) => {
 	const router = express.Router();
 
-	// POST /api/convert?from=USD&to=BTC&amount=100
+	// POST /api/convert?from=INR&to=BTC&amount=100
 	router.post("/", authMiddleware, async (req, res) => {
 		try {
 			console.log("Conversion request received:");
@@ -33,11 +33,11 @@ const conversionRoutes = (io) => {
 				});
 			}
 
-			// ✅ Add validation for supported currencies
-			if (!["USD", "BTC"].includes(from) || !["USD", "BTC"].includes(to)) {
+			// ✅ Add validation for supported currencies (INR <-> BTC)
+			if (!["INR", "BTC"].includes(from) || !["INR", "BTC"].includes(to)) {
 				return res
 					.status(400)
-					.json({ error: "Only USD and BTC are supported" });
+					.json({ error: "Only INR and BTC are supported" });
 			}
 
 			if (from === to) {
@@ -58,13 +58,13 @@ const conversionRoutes = (io) => {
 				btcBalance: wallet.btcBalance,
 			});
 
-			// fetch live price (BTC <-> USD only) with fallback
-			console.log("Fetching BTC price from CoinGecko...");
+			// fetch live price (BTC <-> INR) with fallback
+			console.log("Fetching BTC price (INR) from CoinGecko...");
 			let btcPrice;
 
 			try {
 				const response = await fetch(
-					"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
+					"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=inr",
 					{
 						headers: {
 							"User-Agent": "FinTech-Expense-Tracker/1.0",
@@ -77,33 +77,33 @@ const conversionRoutes = (io) => {
 				}
 
 				const data = await response.json();
-				btcPrice = data.bitcoin.usd;
-				console.log("Current BTC price from CoinGecko:", btcPrice);
+				btcPrice = data.bitcoin.inr;
+				console.log("Current BTC price (INR) from CoinGecko:", btcPrice);
 			} catch (apiError) {
 				console.error("CoinGecko API failed:", apiError.message);
 
 				// Fallback to mock price with warning
-				btcPrice = 110000; // Mock price
+				btcPrice = 5500000; // Mock INR price (example fallback)
 				console.log("Using fallback BTC price:", btcPrice);
 
 				// Don't return error, continue with fallback
 			}
 
 			let convertedAmount;
-			if (from === "USD" && to === "BTC") {
+			if (from === "INR" && to === "BTC") {
 				convertedAmount = amount / btcPrice;
-			} else if (from === "BTC" && to === "USD") {
+			} else if (from === "BTC" && to === "INR") {
 				convertedAmount = amount * btcPrice;
 			} else {
 				console.log("Unsupported conversion pair:", { from, to });
-				return res.status(400).json({ error: "Only USD <-> BTC supported" });
+				return res.status(400).json({ error: "Only INR <-> BTC supported" });
 			}
 
 			console.log(`Conversion: ${amount} ${from} → ${convertedAmount} ${to}`);
 
 			// Check balances before conversion
 			let updatedWallet;
-			if (from === "USD" && to === "BTC") {
+			if (from === "INR" && to === "BTC") {
 				if (wallet.fiatBalance < amount) {
 					console.log("Insufficient fiat balance:", {
 						required: amount,
@@ -148,7 +148,7 @@ const conversionRoutes = (io) => {
 				data: {
 					userId,
 					amount,
-					type: from === "USD" ? "EXPENSE" : "INCOME",
+					type: from === "INR" ? "EXPENSE" : "INCOME",
 					category: "CRYPTO",
 					note: `Converted ${amount} ${from} to ${convertedAmount.toFixed(
 						6

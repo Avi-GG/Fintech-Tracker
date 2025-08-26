@@ -143,7 +143,7 @@ const ExpenseAnalytics = () => {
 							Total Expenses
 						</h3>
 						<p className="text-2xl font-bold text-blue-900">
-							${totalExpenses.toFixed(2)}
+							₹${totalExpenses.toFixed(2)}
 						</p>
 					</div>
 					<div className="bg-green-50 p-4 rounded">
@@ -151,7 +151,7 @@ const ExpenseAnalytics = () => {
 							Daily Average
 						</h3>
 						<p className="text-2xl font-bold text-green-900">
-							${averageDaily.toFixed(2)}
+							₹${averageDaily.toFixed(2)}
 						</p>
 					</div>
 					<div className="bg-purple-50 p-4 rounded">

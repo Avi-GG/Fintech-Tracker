@@ -91,7 +91,7 @@ const fetchCryptoPrices = async () => {
 
 		// Try multiple API endpoints as fallbacks
 		const apiEndpoints = [
-			"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
+			"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=inr",
 			"https://api.coindesk.com/v1/bpi/currentprice.json",
 			"https://api.coinbase.com/v2/exchange-rates?currency=BTC",
 		];
@@ -113,9 +113,10 @@ const fetchCryptoPrices = async () => {
 				data = await response.json();
 				console.log("CoinGecko API response:", data);
 
-				if (data && data.bitcoin && data.bitcoin.usd) {
-					latestCryptoPrices = data;
-					io.emit("cryptoPriceUpdate", data);
+				if (data && data.bitcoin && data.bitcoin.inr) {
+					// Normalize to the same shape expected by clients but with INR
+					latestCryptoPrices = { bitcoin: { inr: data.bitcoin.inr } };
+					io.emit("cryptoPriceUpdate", latestCryptoPrices);
 					fetchAttempts = 0; // Reset on success
 					return;
 				}
@@ -130,10 +131,11 @@ const fetchCryptoPrices = async () => {
 		// Fallback 1: Use mock data if APIs are failing
 		if (fetchAttempts <= MAX_FETCH_ATTEMPTS) {
 			console.log("Using mock crypto price data");
-			const mockPrice = 65000 + Math.floor(Math.random() * 5000); // Random price between 65k-70k
+			// Mock INR price (random example range)
+			const mockPrice = 4500000 + Math.floor(Math.random() * 500000); // Random INR price
 			const mockData = {
 				bitcoin: {
-					usd: mockPrice,
+					inr: mockPrice,
 				},
 			};
 

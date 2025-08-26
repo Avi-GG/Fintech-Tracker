@@ -22,8 +22,8 @@ const CryptoPriceFeed = () => {
 
 				try {
 					// Handle different possible data structures
-					if (data && data.bitcoin && data.bitcoin.usd) {
-						setPrice(data.bitcoin.usd);
+					if (data && data.bitcoin && data.bitcoin.inr) {
+						setPrice(data.bitcoin.inr);
 						setError(null);
 						setLastUpdate(new Date().toLocaleTimeString());
 					} else if (data && typeof data === "number") {
@@ -98,7 +98,7 @@ const CryptoPriceFeed = () => {
 			) : price ? (
 				<div>
 					<p className="text-2xl font-semibold text-green-600">
-						${price.toLocaleString()}
+						₹{price.toLocaleString("en-IN")}
 					</p>
 					{lastUpdate && (
 						<p className="text-xs text-gray-500 mt-1">

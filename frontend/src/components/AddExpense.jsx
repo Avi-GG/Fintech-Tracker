@@ -60,7 +60,7 @@ export default function AddExpense({ onExpenseAdded }) {
 				}
 			);
 
-			setSuccess(`Added expense: $${form.amount} for ${form.description}`);
+			setSuccess(`Added expense: ₹${form.amount} for ${form.description}`);
 			setForm({ amount: "", description: "", category: "Food" });
 
 			if (onExpenseAdded) {
@@ -92,7 +92,7 @@ export default function AddExpense({ onExpenseAdded }) {
 
 			<form onSubmit={handleSubmit} className="space-y-3">
 				<div>
-					<label className="block text-sm font-medium mb-1">Amount ($)</label>
+					<label className="block text-sm font-medium mb-1">Amount (₹)</label>
 					<input
 						type="number"
 						step="0.01"

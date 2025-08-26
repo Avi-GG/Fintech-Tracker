@@ -13,7 +13,7 @@ A comprehensive fintech application built with modern web technologies, featurin
 
 ### 💰 Wallet System
 
-- Multi-currency wallet (USD/BTC)
+- Multi-currency wallet (INR/BTC)
 - Real-time balance updates via WebSocket
 - Deposit/withdraw functionality
 - Transaction history tracking
@@ -25,9 +25,9 @@ A comprehensive fintech application built with modern web technologies, featurin
 - Real-time notifications
 - Transfer history and receipts
 
-### 💱 Cryptocurrency Exchange
+- ### 💱 Cryptocurrency Exchange
 
-- Live BTC/USD conversion rates via CoinGecko API
+- Live BTC/INR conversion rates via CoinGecko API
 - Real-time crypto price feed
 - Conversion history tracking
 - Automatic balance updates
@@ -181,7 +181,7 @@ After running the seed script, you can use these accounts:
 
 ### Conversion
 
-- `POST /api/convert` - Convert USD ↔ BTC
+- `POST /api/convert` - Convert INR ↔ BTC
 
 ### Virtual Cards
 

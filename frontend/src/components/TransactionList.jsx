@@ -286,7 +286,7 @@ const TransactionsList = ({ refreshTrigger }) => {
 										display.isIncome ? "text-green-600" : "text-red-600"
 									}`}
 								>
-									{display.isIncome ? "+" : "-"}${txn.amount}
+									{display.isIncome ? "+" : "-"}₹{txn.amount}
 								</p>
 								<p className="text-xs text-gray-500 uppercase">
 									{txn.category}

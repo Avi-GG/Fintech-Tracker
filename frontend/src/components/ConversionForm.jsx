@@ -1,11 +1,11 @@
 // src/components/ConversionForm.jsx
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
 
 const ConversionForm = () => {
 	const { user } = useAuth();
-	const [from, setFrom] = useState("USD");
+	const [from, setFrom] = useState("INR");
 	const [to, setTo] = useState("BTC");
 	const [amount, setAmount] = useState("");
 	const [message, setMessage] = useState("");
@@ -32,8 +32,6 @@ const ConversionForm = () => {
 			setSuccess("");
 			setMessage("");
 
-			console.log(`Converting ${amount} ${from} to ${to}`);
-
 			const res = await axios.post(
 				`/api/convert?from=${from}&to=${to}&amount=${amount}`,
 				{},
@@ -47,10 +45,11 @@ const ConversionForm = () => {
 					6
 				)} ${to}. Wallet updated!`
 			);
-			setMessage(`Exchange rate: 1 BTC = $${exchangeRate.toLocaleString()}`);
-			setAmount(""); // Clear form
 
-			console.log("Conversion successful:", res.data);
+			setMessage(
+				`Exchange rate: 1 BTC = ₹${exchangeRate.toLocaleString("en-IN")}`
+			);
+			setAmount(""); // Clear form
 
 			// Trigger wallet refresh
 			window.dispatchEvent(new CustomEvent("walletUpdate", { detail: wallet }));
@@ -96,7 +95,7 @@ const ConversionForm = () => {
 							className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
 							disabled={loading}
 						>
-							<option value="USD">💵 USD</option>
+							<option value="INR">₹ INR</option>
 							<option value="BTC">₿ BTC</option>
 						</select>
 					</div>
@@ -110,7 +109,7 @@ const ConversionForm = () => {
 							className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
 							disabled={loading}
 						>
-							<option value="USD">💵 USD</option>
+							<option value="INR">₹ INR</option>
 							<option value="BTC">₿ BTC</option>
 						</select>
 					</div>

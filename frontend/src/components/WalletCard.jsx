@@ -138,7 +138,7 @@ const WalletCard = () => {
 				if (response.data.wallet) {
 					setWallet(response.data.wallet);
 				}
-				alert(`Successfully deposited $${parseFloat(amount).toFixed(2)}`);
+				alert(`Successfully deposited ₹${parseFloat(amount).toFixed(2)}`);
 			}
 		} catch (err) {
 			console.error("Deposit failed:", err);
@@ -157,7 +157,7 @@ const WalletCard = () => {
 				if (response.data.wallet) {
 					setWallet(response.data.wallet);
 				}
-				alert(`Successfully withdrew $${parseFloat(amount).toFixed(2)}`);
+				alert(`Successfully withdrew ₹${parseFloat(amount).toFixed(2)}`);
 			}
 		} catch (err) {
 			console.error("Withdrawal failed:", err);
@@ -215,9 +215,9 @@ const WalletCard = () => {
 
 			<div className="space-y-2">
 				<p className="text-lg">
-					USD:{" "}
+					INR:{" "}
 					<span className="font-semibold">
-						${wallet.fiatBalance?.toFixed(2) || "0.00"}
+						₹{Number(wallet.fiatBalance ?? 0).toFixed(2)}
 					</span>
 				</p>
 				<p className="text-lg">

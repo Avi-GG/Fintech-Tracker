@@ -62,8 +62,8 @@ export const validateAmount = [
 
 // Conversion validation rules
 export const validateConversion = [
-	body("from").isIn(["USD", "BTC"]).withMessage("Invalid from currency"),
-	body("to").isIn(["USD", "BTC"]).withMessage("Invalid to currency"),
+	body("from").isIn(["INR", "BTC"]).withMessage("Invalid from currency"),
+	body("to").isIn(["INR", "BTC"]).withMessage("Invalid to currency"),
 	body("amount")
 		.isFloat({ min: 0.01 })
 		.withMessage("Amount must be greater than 0"),

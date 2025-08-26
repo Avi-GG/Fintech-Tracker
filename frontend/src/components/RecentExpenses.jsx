@@ -77,7 +77,7 @@ const RecentExpenses = ({ limit = 5 }) => {
 								</div>
 							</div>
 							<div className="text-lg font-semibold text-red-600">
-								-${expense.amount.toFixed(2)}
+								-₹{expense.amount.toFixed(2)}
 							</div>
 						</div>
 					))}

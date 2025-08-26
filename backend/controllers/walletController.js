@@ -29,7 +29,7 @@ export const getWallet = async (req, res) => {
 
 // Deposit fiat money
 export const deposit = async (req, res) => {
-	const { amount, currency = "USD" } = req.body;
+	const { amount, currency = "INR" } = req.body;
 	const userId = req.user.id;
 
 	if (!amount || amount <= 0) {
@@ -90,7 +90,7 @@ export const deposit = async (req, res) => {
 
 // Withdraw fiat money
 export const withdraw = async (req, res) => {
-	const { amount, currency = "USD" } = req.body;
+	const { amount, currency = "INR" } = req.body;
 	const userId = req.user.id;
 
 	if (!amount || amount <= 0) {

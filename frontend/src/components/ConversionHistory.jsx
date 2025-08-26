@@ -97,9 +97,12 @@ const ConversionHistory = () => {
 			{conversions.length > 0 ? (
 				<div className="space-y-3">
 					{conversions.map((conversion) => {
-						const isUsdToBtc = conversion.note.includes("USD to");
-						const fromCurrency = isUsdToBtc ? "USD" : "BTC";
-						const toCurrency = isUsdToBtc ? "BTC" : "USD";
+						// Legacy notes may mention USD; treat legacy fiat as INR now
+						const isFiatToBtc =
+							conversion.note.includes("USD to") ||
+							conversion.note.includes("INR to");
+						const fromCurrency = isFiatToBtc ? "INR" : "BTC";
+						const toCurrency = isFiatToBtc ? "BTC" : "INR";
 
 						return (
 							<div
@@ -108,7 +111,7 @@ const ConversionHistory = () => {
 							>
 								<div className="flex items-center space-x-3">
 									<span className="text-2xl">
-										{isUsdToBtc ? "💵➡️₿" : "₿➡️💵"}
+										{isFiatToBtc ? "�➡️₿" : "₿➡️�"}
 									</span>
 									<div>
 										<p className="font-medium text-sm">{conversion.note}</p>
@@ -134,7 +137,7 @@ const ConversionHistory = () => {
 												: "text-green-600"
 										}`}
 									>
-										{conversion.type === "EXPENSE" ? "-" : "+"}$
+										{conversion.type === "EXPENSE" ? "-" : "+"}₹
 										{conversion.amount.toFixed(2)}
 									</div>
 									<div className="text-xs text-gray-500 capitalize">

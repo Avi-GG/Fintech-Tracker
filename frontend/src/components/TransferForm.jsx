@@ -118,7 +118,7 @@ export default function TransferForm({
 			);
 
 			setSuccess(
-				`Successfully transferred $${form.amount} to ${
+				`Successfully transferred ₹${form.amount} to ${
 					selectedUser?.displayName || form.to
 				}`
 			);
@@ -139,9 +139,9 @@ export default function TransferForm({
 				const errorData = err.response.data;
 				if (errorData.error?.includes("Insufficient balance")) {
 					setError(
-						`❌ Insufficient balance! You have $${
+						`❌ Insufficient balance! You have ₹${
 							errorData.available?.toFixed(2) || "0.00"
-						} available, but need $${
+						} available, but need ₹${
 							errorData.required?.toFixed(2) || form.amount
 						}. 
 						
@@ -248,7 +248,7 @@ export default function TransferForm({
 				</div>
 
 				<div>
-					<label className="block text-sm font-medium mb-1">Amount ($)</label>
+					<label className="block text-sm font-medium mb-1">Amount (₹)</label>
 					<input
 						type="number"
 						step="0.01"

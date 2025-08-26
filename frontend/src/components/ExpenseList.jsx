@@ -89,7 +89,7 @@ const ExpenseList = () => {
 			<div className="flex justify-between items-center mb-6">
 				<h1 className="text-2xl font-bold">All Expenses</h1>
 				<div className="text-lg font-semibold text-gray-700">
-					Total: ${totalAmount.toFixed(2)}
+					Total: ₹{totalAmount.toFixed(2)}
 				</div>
 			</div>
 
@@ -172,7 +172,7 @@ const ExpenseList = () => {
 								</div>
 								<div className="text-right">
 									<div className="text-xl font-bold text-red-600">
-										-${expense.amount.toFixed(2)}
+										-₹{expense.amount.toFixed(2)}
 									</div>
 								</div>
 							</div>
@@ -202,13 +202,13 @@ const ExpenseList = () => {
 						</div>
 						<div className="text-center p-3 bg-red-50 rounded">
 							<div className="text-2xl font-bold text-red-600">
-								${totalAmount.toFixed(2)}
+								₹{totalAmount.toFixed(2)}
 							</div>
 							<div className="text-sm text-gray-600">Total Amount</div>
 						</div>
 						<div className="text-center p-3 bg-green-50 rounded">
 							<div className="text-2xl font-bold text-green-600">
-								${(totalAmount / filteredExpenses.length).toFixed(2)}
+								₹{(totalAmount / filteredExpenses.length).toFixed(2)}
 							</div>
 							<div className="text-sm text-gray-600">Average Amount</div>
 						</div>

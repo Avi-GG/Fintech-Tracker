@@ -248,7 +248,7 @@ export const transfer = async (req, res) => {
 		res.json({
 			success: true,
 			transaction: result[2], // Return sender's transaction record
-			message: `Successfully transferred $${amount} to User ${to}`,
+			message: `Successfully transferred ₹${amount} to User ${to}`,
 		});
 	} catch (err) {
 		console.error("Transfer error details:", err);
