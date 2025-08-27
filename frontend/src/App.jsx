@@ -5,6 +5,7 @@ import {
 	Navigate,
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Convert from "./pages/Convert";
@@ -22,6 +23,7 @@ function Layout() {
 			<main className="flex-1 container mx-auto px-4 py-6">
 				<Outlet />
 			</main>
+			<Footer />
 		</div>
 	);
 }

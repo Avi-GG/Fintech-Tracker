@@ -1,4 +1,4 @@
-# 🚀 Fintech Expense Tracker
+# 🚀 Fintech Tracker
 
 A comprehensive fintech application built with modern web technologies, featuring real-time transactions, cryptocurrency conversion, virtual cards, and analytics.
 
